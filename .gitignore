@@ -1,2 +1,6 @@
 data/pure_original_data/
 data/pure_processed_HWT/
+t5.small.0422.pt
+ckpt/
+logs/
+results/

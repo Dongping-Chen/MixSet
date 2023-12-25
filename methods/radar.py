@@ -52,22 +52,14 @@ def fine_tune_radar(model, tokenizer, data, batch_size, DEVICE, epochs=3, ckpt_d
     model.save_pretrained(os.path.join(ckpt_dir, 'radar'))
     print(f"Saved finetuned model to {os.path.join(ckpt_dir, 'radar')}")
 
-def run_radar(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_dir = './ckpt', test_only: bool=False):
-    tokenizer = AutoTokenizer.from_pretrained("TrustSafeAI/RADAR-Vicuna-7B")
-    model = AutoModelForSequenceClassification.from_pretrained("TrustSafeAI/RADAR-Vicuna-7B").to(DEVICE)
+def evaluate_model(model, tokenizer, data, DEVICE, no_auc=False):
     sentences = data['test']['text']
     labels = data['test']['label']
-    
-    if finetune and not test_only:
-        fine_tune_radar(model, tokenizer, data, batch_size=12, DEVICE=DEVICE, epochs=3, ckpt_dir = ckpt_dir)
-    elif finetune and test_only:
-        model = AutoModel.from_pretrained(os.path.join(ckpt_dir, 'radar'))
-        
+
     probs = []
     preds = []
-    acc = 0
     with torch.no_grad():
-        for i in tqdm.tqdm(range(len(sentences)), desc="Radar evaluating"):
+        for i in tqdm.tqdm(range(len(sentences)), desc="Evaluating"):
             inputs = tokenizer(sentences[i], return_tensors="pt").to(DEVICE)
             logits = model(**inputs).logits.to('cpu')
             probs.append(logits.argmax().tolist()[0])
@@ -76,16 +68,31 @@ def run_radar(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_dir =
                 preds.append(1)
             elif model.config.id2label[predicted_class_id] == "LABEL_1":
                 preds.append(0)
-                
+    
     train_res, test_res = cal_metrics(labels, preds, probs, no_auc=no_auc)
     acc_test, precision_test, recall_test, f1_test, auc_test = test_res
+    results_dict = {
+        "name": "Radar", 
+        'acc_test': acc_test,
+        'precision_test': precision_test,
+        'recall_test': recall_test,
+        'f1_test': f1_test,
+        'auc_test': auc_test,
+    }
+    print(results_dict)
+    return results_dict
 
-    print(f"acc_test: {acc_test}, precision_test: {precision_test}, recall_test: {recall_test}, f1_test: {f1_test}, auc_test: {auc_test}")
-    dict = {"name": "GPT-sentinel", 
-            'acc_test': acc_test,
-            'precision_test': precision_test,
-            'recall_test': recall_test,
-            'f1_test': f1_test,
-            'auc_test': auc_test,}
-    print(dict)
-    return dict
+def run_radar(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_dir = './ckpt', test_only: bool=False):
+    tokenizer = AutoTokenizer.from_pretrained("TrustSafeAI/RADAR-Vicuna-7B")
+    model = AutoModelForSequenceClassification.from_pretrained("TrustSafeAI/RADAR-Vicuna-7B").to(DEVICE)
+    
+    dict_before = evaluate_model(model, tokenizer, data, DEVICE, no_auc=no_auc)
+    
+    if finetune and not test_only:
+        fine_tune_radar(model, tokenizer, data, batch_size=12, DEVICE=DEVICE, epochs=3, ckpt_dir = ckpt_dir)
+    elif finetune and test_only:
+        model = AutoModel.from_pretrained(os.path.join(ckpt_dir, 'radar'))
+        
+    dict_after = evaluate_model(model, tokenizer, data, DEVICE, no_auc=no_auc)
+    
+    return {"Radar_retrained" if finetune else "Radar": dict_after}

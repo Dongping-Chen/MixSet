@@ -19,19 +19,8 @@ class CustomDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.labels)
-    
-def run_sentinel(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_dir = './ckpt', test_only: bool=False):
-    model = T5ForConditionalGeneration.from_pretrained('t5-small', return_dict=True)
-    tokenizer = T5Tokenizer.from_pretrained('t5-small')
-    state_dict = torch.load('t5.small.0422.pt')['model']
-    adjusted_state_dict = {k.replace('t5_model.', ''): v for k, v in state_dict.items()}
-    model.load_state_dict(adjusted_state_dict, strict=True)
-    
-    if finetune and not test_only:
-        fine_tune_model(model, tokenizer, data, batch_size=16, DEVICE=DEVICE, epochs=3, ckpt_dir = ckpt_dir)
-    elif finetune and test_only:
-        model.load_state_dict(torch.load(os.path.join(ckpt_dir, 'sentinel.pth')))
-        
+
+def evaluate_sentinel(model, tokenizer, data, DEVICE, ckpt_dir='./ckpt', no_auc=False):
     sentences = data['test']['text']
     labels = data['test']['label']
     probs = []
@@ -40,11 +29,9 @@ def run_sentinel(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_di
     model.to(DEVICE)
     for i in tqdm.tqdm(range(len(sentences)), desc="Sentinel evaluating"):
         input_ids = tokenizer.encode(sentences[i], return_tensors='pt').to(DEVICE)
-        # 使用 generate 方法而不是直接调用前向传播
         output = model.generate(input_ids)
         decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)
 
-        # 获取 positive 和 negative 的概率
         logits = model(input_ids, decoder_input_ids=output, return_dict=True).logits[0][0]
         positive_idx = tokenizer.convert_tokens_to_ids('positive')
         negative_idx = tokenizer.convert_tokens_to_ids('negative')
@@ -64,14 +51,33 @@ def run_sentinel(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_di
     acc_test, precision_test, recall_test, f1_test, auc_test = test_res
 
     print(f"acc_test: {acc_test}, precision_test: {precision_test}, recall_test: {recall_test}, f1_test: {f1_test}, auc_test: {auc_test}")
-    dict = {"name": "GPT-sentinel", 
-            'acc_test': acc_test,
-            'precision_test': precision_test,
-            'recall_test': recall_test,
-            'f1_test': f1_test,
-            'auc_test': auc_test,}
-    print(dict)
-    return dict
+    results_dict = {
+        "name": "GPT-sentinel", 
+        'acc_test': acc_test,
+        'precision_test': precision_test,
+        'recall_test': recall_test,
+        'f1_test': f1_test,
+        'auc_test': auc_test,
+    }
+    print(results_dict)
+    return results_dict
+
+def run_sentinel(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_dir = './ckpt', test_only: bool=False):
+    model = T5ForConditionalGeneration.from_pretrained('t5-small', return_dict=True)
+    tokenizer = T5Tokenizer.from_pretrained('t5-small')
+    state_dict = torch.load('t5.small.0422.pt')['model']
+    adjusted_state_dict = {k.replace('t5_model.', ''): v for k, v in state_dict.items()}
+    model.load_state_dict(adjusted_state_dict, strict=True)
+    
+    dict_before = evaluate_sentinel(model, tokenizer, data, DEVICE, ckpt_dir=ckpt_dir, no_auc=no_auc)
+    
+    if finetune and not test_only:
+        fine_tune_model(model, tokenizer, data, batch_size=16, DEVICE=DEVICE, epochs=3, ckpt_dir = ckpt_dir)
+    elif finetune and test_only:
+        model.load_state_dict(torch.load(os.path.join(ckpt_dir, 'sentinel.pth')))
+        
+    dict_after = evaluate_sentinel(model, tokenizer, data, DEVICE, ckpt_dir=ckpt_dir, no_auc=no_auc)
+    return {"after": dict_after}
 
 
 def fine_tune_model(model, tokenizer, data, batch_size, DEVICE, epochs=3, ckpt_dir='./ckpt'):
