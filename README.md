@@ -1,17 +1,38 @@
 <div align="center">
 <h1>Mixset</h1>
-
+<a href="https://arxiv.org/pdf/2311.06749" target='_blank'>[arXiv]</a>
 <img src="figures/outline.jpg">
 <img src="figures/self_bleu.jpg">
 <p align="center">
-<a href="https://arxiv.org/pdf/2311.06749" target='_blank'>[arXiv]</a>
+
 </p>
-This repository is a official code of the research presented in the paper ["Mixset"](https://arxiv.org/pdf/2311.06749). The goal is to provide a transparent, open-source implementation for the community to explore and build upon.
+This repository is a official code of the research presented in the paper <a href="https://arxiv.org/pdf/2311.06749" target='_blank'>[arXiv]</a>. The goal is to provide a transparent, open-source implementation for the community to explore and build upon.
 </div>
 
+# Dataset: MixSet
 
-## Abstract
-...
+### Overview
+The MixSet dataset is a comprehensive collection designed for advanced machine learning experiments. It's structured to support a variety of tasks including text classification, natural language understanding, and more.
+
+### Location
+The dataset is located in the `./data/MixSet/` directory relative to the project's root. Ensure that this path exists and contains the necessary data files before running any scripts that depend on the MixSet dataset.
+
+### Structure
+Describe in detailed in [readme](https://github.com/Dongping-Chen/MixSet/tree/main/data/MixSet).
+
+### Usage
+To use the MixSet dataset in your experiments, refer to the scripts or modules specifically designed to read and process this data. Ensure that any path or configuration settings in your scripts point to the correct `./data/MixSet/` location.
+
+### Customization
+If you customize or extend the dataset, consider documenting your changes here. This might include adding new files, filtering or processing data, or generating synthetic data points.
+
+### Acknowledgements
+If the MixSet dataset is sourced from or inspired by an external project, publication, or another dataset, be sure to acknowledge the original creators or contributors here.
+
+### Contact
+For any issues, questions, or suggestions related to the MixSet dataset, please contact [Dongping Chen](mailto:cdp_0612@163.com) or open an issue in the project's repository.
+
+# Usage
 
 ## Prerequisites
 
@@ -44,32 +65,9 @@ To download the HWT datasets, please refer to [this link](https://1drv.ms/u/s!Ai
 4. **Download Checkpoints of GPT-Sentinel**
 Download the pretrained [GPT-Sentinel t5-small](https://1drv.ms/u/s!AivM2GUMbPYyjkqfT_3Ri-fpnifX?e=eqG1t7) and put to `<YOUR PATH>/MixSet/`.
 
-## Dataset: MixSet
+## Experiment Reproduce
 
-### Overview
-The MixSet dataset is a comprehensive collection designed for advanced machine learning experiments. It's structured to support a variety of tasks including text classification, natural language understanding, and more.
-
-### Location
-The dataset is located in the `./data/MixSet/` directory relative to the project's root. Ensure that this path exists and contains the necessary data files before running any scripts that depend on the MixSet dataset.
-
-### Structure
-Describe in detailed in [readme](https://github.com/Dongping-Chen/MixSet/tree/main/data/MixSet).
-
-### Usage
-To use the MixSet dataset in your experiments, refer to the scripts or modules specifically designed to read and process this data. Ensure that any path or configuration settings in your scripts point to the correct `./data/MixSet/` location.
-
-### Customization
-If you customize or extend the dataset, consider documenting your changes here. This might include adding new files, filtering or processing data, or generating synthetic data points.
-
-### Acknowledgements
-If the MixSet dataset is sourced from or inspired by an external project, publication, or another dataset, be sure to acknowledge the original creators or contributors here.
-
-### Contact
-For any issues, questions, or suggestions related to the MixSet dataset, please contact [Dongping Chen](mailto:cdp_0612@163.com) or open an issue in the project's repository.
-
-## Usage
-
-1. **Experiment 1**
+### **Experiment 1**
 To reproduce the first experiments, run:
 ```shell
 ./Ex1_run.sh
@@ -80,7 +78,7 @@ You should run GPT-Zero by:
 ```
 As for [Ghostbuster](https://github.com/vivek3141/ghostbuster), we will update the code as soon as possible.
 
-2. **Experiment 2**
+### **Experiment 2**
 To reproduce the second experiments for binary classification, run:
 ```shell
 ./Ex2_binary_run
@@ -89,11 +87,9 @@ To reproduce the second experiments for three-class classification, run:
 ```shell
 ./Ex2_three_class_run
 ```
-### Storage Requirements for Experiment 3 and 4 Scripts
 
-Please be aware that the scripts for Experiment 3 and 4 require storing trained checkpoints in the folder path. This may occupy more than 20GB of space. It is essential to ensure that you have sufficient storage available on your device. Failing to allocate the necessary space might lead to interruptions during the code execution. We highly recommend checking and freeing up adequate space before running these scripts to ensure a smooth and uninterrupted experience.
 
-3. **Experiment 3**
+### **Experiment 3**
 To reproduce the third experiments for operation-wise transfer learning, run:
 ```shell
 ./Ex3_operation_train.sh
@@ -103,16 +99,16 @@ To reproduce the third experiments for LLM-wise transfer learning, run:
 ```shell
 ./Ex3_LLM_transfer.sh
 ```
+#### Storage Requirements for Experiment 3 and 4 Scripts
 
-4. **Experiment 4**
+Please be aware that the scripts for Experiment 3 and 4 require storing trained checkpoints in the folder path. This may occupy more than 20GB of space. It is essential to ensure that you have sufficient storage available on your device. Failing to allocate the necessary space might lead to interruptions during the code execution. We highly recommend checking and freeing up adequate space before running these scripts to ensure a smooth and uninterrupted experience.
+
+### **Experiment 4**
 To reproduce the fourth experiments for ablation study, run:
 ```shell
 ./Ex4_auto_train.sh
 ./Ex4_auto_test.sh
 ```
-### Parameters
-
-You can customize the execution by specifying various parameters on your self for free:
 
 ### Script Parameters Description
 
