@@ -1,8 +1,8 @@
 <div align="center">
 <h1>Mixset</h1>
 
-<img src="figures/outline.png">
-<img src="figures/self_bleu.png">
+<img src="figures/outline.jpg">
+<img src="figures/self_bleu.jpg">
 <p align="center">
 <a href="https://arxiv.org/pdf/2311.06749" target='_blank'>[arXiv]</a>
 </p>
