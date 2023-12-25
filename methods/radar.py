@@ -4,7 +4,9 @@ import torch
 import tqdm
 import os
 from torch.cuda.amp import GradScaler, autocast
-from utils import *
+from methods.utils import *
+import torch.nn.functional as F
+
 
 class CustomDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
@@ -29,7 +31,7 @@ def fine_tune_radar(model, tokenizer, data, batch_size, DEVICE, epochs=3, ckpt_d
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-    optimizer = AdamW(model.parameters(), lr=5e-5)
+    optimizer = AdamW(model.parameters(), lr=5e-6)
     scaler = GradScaler() 
     model.train()
     model.to(DEVICE)
@@ -62,14 +64,18 @@ def evaluate_model(model, tokenizer, data, DEVICE, no_auc=False):
         for i in tqdm.tqdm(range(len(sentences)), desc="Evaluating"):
             inputs = tokenizer(sentences[i], return_tensors="pt").to(DEVICE)
             logits = model(**inputs).logits.to('cpu')
-            probs.append(logits.argmax().tolist()[0])
+            softmax_probs = F.softmax(logits, dim=-1)
+            
+            class_0_probs = softmax_probs[0].tolist()[0]
+            probs.append(class_0_probs)
+            
             predicted_class_id = int(logits.argmax())
             if model.config.id2label[predicted_class_id] == "LABEL_0":
                 preds.append(1)
             elif model.config.id2label[predicted_class_id] == "LABEL_1":
                 preds.append(0)
-    
-    train_res, test_res = cal_metrics(labels, preds, probs, no_auc=no_auc)
+
+    test_res = cal_metrics(labels, preds, probs, no_auc=no_auc)
     acc_test, precision_test, recall_test, f1_test, auc_test = test_res
     results_dict = {
         "name": "Radar", 

@@ -4,7 +4,9 @@ import tqdm
 from torch.utils.data import DataLoader
 from transformers import AdamW
 import os
-from utils import *
+from methods.utils import *
+import torch.nn.functional as F
+
 
 class CustomDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
@@ -47,7 +49,7 @@ def evaluate_sentinel(model, tokenizer, data, DEVICE, ckpt_dir='./ckpt', no_auc=
         probs.append(positive_prob)
         preds.append(1 if positive_prob > negative_prob else 0)
         
-    train_res, test_res = cal_metrics(labels, preds, probs, no_auc=no_auc)
+    test_res = cal_metrics(labels, preds, probs, no_auc=no_auc)
     acc_test, precision_test, recall_test, f1_test, auc_test = test_res
 
     print(f"acc_test: {acc_test}, precision_test: {precision_test}, recall_test: {recall_test}, f1_test: {f1_test}, auc_test: {auc_test}")

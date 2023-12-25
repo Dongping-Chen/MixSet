@@ -206,7 +206,7 @@ def fine_tune_model(model, tokenizer, data, batch_size, DEVICE, pos_bit=1, num_l
         {'params': [p for n, p in model.named_parameters() if any(
             nd in n for nd in no_decay)], 'weight_decay': 0.0}
     ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=1e-5)
+    optimizer = AdamW(optimizer_grouped_parameters, lr=5e-6)
 
     for epoch in range(epochs):
         for batch in tqdm(train_loader, desc=f"Fine-tuning: {epoch} epoch"):

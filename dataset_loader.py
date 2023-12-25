@@ -194,7 +194,7 @@ def process_mixcase_data(filename1, filename2, no_auc, mixcase_threshold, train_
     if filename2 is None:
         if not train_with_mixcase:
             # Ex1, train with pure MGT and HWT, then test on Mixcase in binary classification setting.
-            Mixcase_data = load_Mixcase(filename1, no_auc, train_with_mixcase, mixcase_as_mgt)
+            Mixcase_data = load_Mixcase(filename=filename1, no_auc=no_auc, train_with_mixcase=train_with_mixcase, mixcase_as_mgt=mixcase_as_mgt)
             data_new['test']['text'] += Mixcase_data['text']
             data_new['test']['label'] += Mixcase_data['label']
         else:
@@ -279,7 +279,7 @@ def load_HWT(HWT_size, seed:int=0):
         - 'text': A list of processed sentences.
         - 'label': A numpy array of zeros with a length equal to the minimum of HWT_size and the total number of loaded sentences.
     """
-    root = './processed_HWT/'
+    root = './data/pure_processed_HWT/'
     file_names = ['blog.json', 'game.json', 'News.json', 'paper_abstract.json', 'talks.json', 'transcript.json', 'email.json']
     data_sum = []
     for name in file_names:
@@ -303,7 +303,7 @@ def load_HWT(HWT_size, seed:int=0):
     print(len(data_new['label']),len(data_new['text']))
     return data_new
 
-def load_Mixcase(filename, no_auc, mixcase_threshold: float=0.8, train_with_mixcase:bool = False, seed:int=None, three_classes:bool=False, mixcase_as_mgt:bool=False):
+def load_Mixcase(filename, no_auc:bool=False, mixcase_threshold: float=0.8, train_with_mixcase:bool = False, seed:int=None, three_classes:bool=False, mixcase_as_mgt:bool=False):
     """
     Load Mixcase dataset from a JSON file.
 
@@ -319,7 +319,7 @@ def load_Mixcase(filename, no_auc, mixcase_threshold: float=0.8, train_with_mixc
     Returns:
         dict: A dictionary containing the loaded dataset.
     """
-    with open(os.path.join("./MixSet",filename)) as file:
+    with open(os.path.join("./data/MixSet",filename)) as file:
         f = json.load(file)
     mgt = []
     hwt = []
@@ -455,21 +455,21 @@ def load_dataset(dataset_name, MGT_only_GPT):
     mgt = []
     hwt = []
     if dataset_name == 'TruthfulQA':
-        f = pd.read_csv("datasets/TruthfulQA_LLMs.csv")
+        f = pd.read_csv("./data/MGT_datasets/modified_TruthfulQA_LLMs.csv")
         a_human = f['Best Answer'].tolist()
         for i in range(len(a_human)):
             processed_human = process_spaces(a_human[i])
             if len(processed_human.split()) > 50 and len(processed_human) < 2000:
                 hwt.append(processed_human)
     elif dataset_name == 'SQuAD1':
-        f = pd.read_csv("datasets/modified_SQuAD1_LLMs.csv")
+        f = pd.read_csv("./data/MGT_datasets/modified_SQuAD1_LLMs.csv")
         a_human = [eval(_)['text'][0] for _ in f['answers'].tolist()]
         for i in range(len(a_human)):
             processed_human = process_spaces(a_human[i])
             if len(processed_human.split()) > 50 and len(processed_human) < 2000:
                 hwt.append(processed_human)
     elif dataset_name == 'NarrativeQA':
-        f = pd.read_csv("datasets/modified_NarrativeQA_LLMs.csv")
+        f = pd.read_csv("./data/MGT_datasets/modified_NarrativeQA_LLMs.csv")
         a_human = f['answers'].tolist()
         a_human = [_.split(";")[0] for _ in a_human]
         for i in range(len(a_human)):

@@ -1,6 +1,9 @@
 data/pure_original_data/
 data/pure_processed_HWT/
+data/MGT_datasets/
 t5.small.0422.pt
 ckpt/
 logs/
 results/
+.cache/
+__pycache__/
