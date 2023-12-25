@@ -162,8 +162,8 @@ if __name__ == '__main__':
         #     # run DetectGPT
         #     outputs.append(run_detectgpt_experiments(
         #         args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_sentinel(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
-        outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
+        outputs.append(run_sentinel(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
+        # outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
         outputs.append(run_supervised_experiment(data, model='roberta-base-openai-detector',
                     cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=args.finetune))
         outputs.append(run_supervised_experiment(data, model='Hello-SimpleAI/chatgpt-detector-roberta',
