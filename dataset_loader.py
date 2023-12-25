@@ -132,6 +132,11 @@ def load_All(filename1, filename2: str = None, MGT_only_GPT: bool = False, train
     if test_only:
         data_new['train']['text'] = []
         data_new['train']['label'] = []
+    else:
+        combined = list(zip(data_new['train']['text'], data_new['train']['label']))
+        random.seed(seed) 
+        random.shuffle(combined)
+        data_new['train']['text'], data_new['train']['label'] = zip(*combined)
         
     print(len(data_new['train']['text']), len(data_new['test']['text']))
     print(data_new['test']['label'])
@@ -218,9 +223,9 @@ def process_mixcase_data(filename1, filename2, no_auc, mixcase_threshold, train_
         # set training data to none for quicker inference
         data_new['train']['text'] = []
         data_new['train']['label'] = []
+    
     return data_new
 
-# Additional helper function load_and_process_multiple_mixcase_files will be defined to handle the specific case of loading multiple Mixcase files.
 def load_and_process_multiple_mixcase_files(data_new, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mgt_only_gpt, mixcase_as_mgt):
     """
     Load and process multiple Mixcase files.

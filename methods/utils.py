@@ -82,7 +82,11 @@ def load_base_model(base_model, DEVICE):
 
 
 def cal_metrics(label, pred_label, pred_posteriors, no_auc):
-    if len(set(label)) < 3:
+    flag = True
+    for i in set(label):
+        if i >= 2:
+            flag = False
+    if flag:
         acc = accuracy_score(label, pred_label)
         precision = precision_score(label, pred_label)
         recall = recall_score(label, pred_label)

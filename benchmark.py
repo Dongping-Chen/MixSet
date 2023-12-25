@@ -149,19 +149,19 @@ if __name__ == '__main__':
             args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         
     else:
-        # if not args.only_supervised:
-        #     outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_threshold_experiment(
-        #         data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_threshold_experiment(
-        #         data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     # run GPTZero: pleaze specify your gptzero_key in the args
-        #     # outputs.append(run_gptzero_experiment(data, api_key=args.gptzero_key, test_only = args.test_only, no_auc=args.no_auc))
-        #     # run DetectGPT
-        #     outputs.append(run_detectgpt_experiments(
-        #         args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        if not args.only_supervised:
+            outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_threshold_experiment(
+                data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_threshold_experiment(
+                data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            # run GPTZero: pleaze specify your gptzero_key in the args
+            # outputs.append(run_gptzero_experiment(data, api_key=args.gptzero_key, test_only = args.test_only, no_auc=args.no_auc))
+            # run DetectGPT
+            outputs.append(run_detectgpt_experiments(
+                args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_sentinel(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
         # outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
         outputs.append(run_supervised_experiment(data, model='roberta-base-openai-detector',
