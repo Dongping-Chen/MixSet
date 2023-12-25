@@ -63,6 +63,20 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
+    if args.dataset != "All":
+        data = dataset_loader.load(args.dataset, detectLLM=args.detectLLM)
+    else:
+        data = dataset_loader.load(args.dataset, Mixcase_filename = args.Mixcase_filename,
+                                   MGT_only_GPT = args.MGT_only_GPT,
+                                   test_only = args.test_only,
+                                   train_threshold = args.train_threshold,
+                                   no_auc = args.no_auc,
+                                   train_with_mixcase = args.train_with_mixcase,
+                                   seed = args.seed,
+                                   mixcase_threshold = args.mixcase_threshold,
+                                   transfer_filename = args.transfer_filename,
+                                   three_classes = args.three_classes,
+                                   mixcase_as_mgt = args.mixcase_as_mgt)
     if not os.path.exists(args.ckpt_dir):
         # 如果文件夹不存在，则创建它
         os.makedirs(args.ckpt_dir)
@@ -73,28 +87,6 @@ if __name__ == '__main__':
 
     START_DATE = datetime.datetime.now().strftime('%Y-%m-%d')
     START_TIME = datetime.datetime.now().strftime('%H-%M-%S-%f')
-
-    filename = os.path.join("/media/ssd/cdp/Mixcase/Mixcase/data/mixcase_data",args.Mixcase_filename)
-    with open(filename, "r") as f:
-        json_data = json.load(f)
-    data = {"train":{
-        "text": [],
-        "label": []
-        },
-        "test":{
-            "text": [],
-            "label": []
-        }
-    }
-    real_key = "sentence"
-    for i in list(json_data[0].keys()):
-        if "sentence" in i:
-            real_key = i
-    print(real_key)
-    for i in json_data:
-        data['test']['text'].append(i[real_key])
-    data['test']['text'] = data['test']['text']
-    data['test']['label'] = list(np.ones(len(data['test']['text']),dtype=int))
 
 
     base_model_name = args.base_model_name.replace('/', '_')
@@ -142,13 +134,13 @@ if __name__ == '__main__':
     outputs = []
     
     if args.three_classes:
-        # outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_threshold_experiment(
-        #     data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_threshold_experiment(
-        #     data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(
+            data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(
+            data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_supervised_experiment(data, model='distilbert-base-uncased',
                    cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, num_labels=3, finetune=True, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_supervised_experiment(data, model='Hello-SimpleAI/chatgpt-detector-roberta',
@@ -157,33 +149,33 @@ if __name__ == '__main__':
             args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         
     else:
-        # if not args.only_supervised:
-        #     outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_threshold_experiment(
-        #         data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_threshold_experiment(
-        #         data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        #     outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        if not args.only_supervised:
+            outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_threshold_experiment(
+                data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_threshold_experiment(
+                data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+            outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
             # run GPTZero: pleaze specify your gptzero_key in the args
             # outputs.append(run_gptzero_experiment(data, api_key=args.gptzero_key, test_only = args.test_only, no_auc=args.no_auc))
             # run DetectGPT
-        #     outputs.append(run_detectgpt_experiments(
-        #         args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_sentinel(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
-        # outputs.append(run_supervised_experiment(data, model='roberta-base-openai-detector',
-        #             cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=args.finetune))
-        # outputs.append(run_supervised_experiment(data, model='Hello-SimpleAI/chatgpt-detector-roberta',
-        #             cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=args.finetune))
+            outputs.append(run_detectgpt_experiments(
+                args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_sentinel(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
+        outputs.append(run_supervised_experiment(data, model='roberta-base-openai-detector',
+                    cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=args.finetune))
+        outputs.append(run_supervised_experiment(data, model='Hello-SimpleAI/chatgpt-detector-roberta',
+                    cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=args.finetune))
         outputs.append(run_supervised_experiment(data, model='distilbert-base-uncased',
                     cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, finetune=True, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
+        outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
 
     # save results
     import pickle as pkl
     with open(os.path.join(SAVE_PATH, f"benchmark_results.pkl"), "wb") as f:
         pkl.dump(outputs, f)
-    with open(f"logs/{args.log_name}_{args.Mixcase_filename}l", "a") as wf:
+    with open(f"logs/{args.log_name}", "a") as wf:
         for row in outputs:
             json.dump(row, wf)
             wf.write("\n")

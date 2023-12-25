@@ -92,7 +92,7 @@ def get_entropy(text, base_model, base_tokenizer, DEVICE):
 
 
 @timeit
-def run_threshold_experiment(data, criterion_fn, name):
+def run_threshold_experiment(data, criterion_fn, name, test_only: bool=False, no_auc: bool=False, ckpt_dir: str='./ckpt'):
     torch.manual_seed(0)
     np.random.seed(0)
 
@@ -114,7 +114,7 @@ def run_threshold_experiment(data, criterion_fn, name):
     x_test = np.expand_dims(x_test, axis=-1)
     y_test = test_label
 
-    train_res, test_res = get_clf_results(x_train, y_train, x_test, y_test)
+    train_res, test_res = get_clf_results(x_train, y_train, x_test, y_test, name, test_only, no_auc, ckpt_dir)
 
     acc_train, precision_train, recall_train, f1_train, auc_train = train_res
     acc_test, precision_test, recall_test, f1_test, auc_test = test_res
@@ -141,7 +141,7 @@ def run_threshold_experiment(data, criterion_fn, name):
 
 
 @timeit
-def run_GLTR_experiment(data, criterion_fn, name):
+def run_GLTR_experiment(data, criterion_fn, name, test_only: bool=False, no_auc: bool=False, ckpt_dir: str='./ckpt'):
     torch.manual_seed(0)
     np.random.seed(0)
 
@@ -159,7 +159,7 @@ def run_GLTR_experiment(data, criterion_fn, name):
     x_test = np.array(test_criterion)
     y_test = test_label
 
-    train_res, test_res = get_clf_results(x_train, y_train, x_test, y_test)
+    train_res, test_res = get_clf_results(x_train, y_train, x_test, y_test, name, test_only, no_auc, ckpt_dir)
 
     acc_train, precision_train, recall_train, f1_train, auc_train = train_res
     acc_test, precision_test, recall_test, f1_test, auc_test = test_res

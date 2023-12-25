@@ -5,7 +5,7 @@ from tqdm import tqdm
 from methods.utils import timeit, cal_metrics
 from torch.utils.data import DataLoader
 from transformers import AdamW
-
+import os
 
 class CustomDataset(torch.utils.data.Dataset):
     def __init__(self, encodings, labels):
@@ -23,74 +23,129 @@ class CustomDataset(torch.utils.data.Dataset):
 
 
 @timeit
-def run_supervised_experiment(data, model, cache_dir, batch_size, DEVICE, pos_bit=0, finetune=False, num_labels=2, epochs=3):
+def run_supervised_experiment(data, model, cache_dir, batch_size, DEVICE, pos_bit=0, finetune=False, num_labels=2, epochs=3, test_only = False, no_auc=False, ckpt_dir='./ckpt/'):
     print(f'Beginning supervised evaluation with {model}...')
     detector = transformers.AutoModelForSequenceClassification.from_pretrained(
         model, num_labels=num_labels, cache_dir=cache_dir, ignore_mismatched_sizes=True).to(DEVICE)
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         model, cache_dir=cache_dir)
 
-    if finetune:
+    if finetune and not test_only:
         fine_tune_model(detector, tokenizer, data, batch_size,
-                        DEVICE, pos_bit, num_labels, epochs=epochs)
+                        DEVICE, pos_bit, num_labels, epochs=epochs, ckpt_dir=ckpt_dir)
+    elif finetune and test_only:
+        model_path = os.path.join(ckpt_dir, f"{detector._get_name()}.pt")
 
-    train_text = data['train']['text']
-    train_label = data['train']['label']
-    test_text = data['test']['text']
-    test_label = data['test']['label']
+        if not os.path.isfile(model_path):
+            raise FileNotFoundError(f"No model found at {model_path}")
 
-    # detector.save_pretrained(".cache/lm-d-xxx", from_pt=True)
+        model.load_state_dict(torch.load(model_path))
+    if test_only:
+        test_text = data['test']['text']
+        test_label = data['test']['label']
 
-    if num_labels == 2:
-        train_preds = get_supervised_model_prediction(
-            detector, tokenizer, train_text, batch_size, DEVICE, pos_bit)
-        test_preds = get_supervised_model_prediction(
-            detector, tokenizer, test_text, batch_size, DEVICE, pos_bit)
-    else:
-        train_preds = get_supervised_model_prediction_multi_classes(
-            detector, tokenizer, train_text, batch_size, DEVICE, pos_bit)
-        test_preds = get_supervised_model_prediction_multi_classes(
-            detector, tokenizer, test_text, batch_size, DEVICE, pos_bit)
+        # detector.save_pretrained(".cache/lm-d-xxx", from_pt=True)
 
-    predictions = {
-        'train': train_preds,
-        'test': test_preds,
-    }
-    y_train_pred_prob = train_preds
-    y_train_pred = [round(_) for _ in y_train_pred_prob]
-    y_train = train_label
+        if num_labels == 2:
+            test_preds = get_supervised_model_prediction(
+                detector, tokenizer, test_text, batch_size, DEVICE, pos_bit)
+        else:
+            test_preds = get_supervised_model_prediction_multi_classes(
+                detector, tokenizer, test_text, batch_size, DEVICE, pos_bit)
 
-    y_test_pred_prob = test_preds
-    y_test_pred = [round(_) for _ in y_test_pred_prob]
-    y_test = test_label
-
-    train_res = cal_metrics(y_train, y_train_pred, y_train_pred_prob)
-    test_res = cal_metrics(y_test, y_test_pred, y_test_pred_prob)
-    acc_train, precision_train, recall_train, f1_train, auc_train = train_res
-    acc_test, precision_test, recall_test, f1_test, auc_test = test_res
-    print(f"{model} acc_train: {acc_train}, precision_train: {precision_train}, recall_train: {recall_train}, f1_train: {f1_train}, auc_train: {auc_train}")
-    print(f"{model} acc_test: {acc_test}, precision_test: {precision_test}, recall_test: {recall_test}, f1_test: {f1_test}, auc_test: {auc_test}")
-
-    # free GPU memory
-    del detector
-    torch.cuda.empty_cache()
-
-    return {
-        'name': model,
-        'predictions': predictions,
-        'general': {
-            'acc_train': acc_train,
-            'precision_train': precision_train,
-            'recall_train': recall_train,
-            'f1_train': f1_train,
-            'auc_train': auc_train,
-            'acc_test': acc_test,
-            'precision_test': precision_test,
-            'recall_test': recall_test,
-            'f1_test': f1_test,
-            'auc_test': auc_test,
+        predictions = {
+            'test': test_preds,
         }
-    }
+
+        y_test_pred_prob = test_preds
+        y_test_pred = [round(_) for _ in y_test_pred_prob]
+        y_test = test_label
+
+        train_res = 0, 0, 0, 0, -1.0
+        test_res = cal_metrics(y_test, y_test_pred, y_test_pred_prob, no_auc)
+        acc_train, precision_train, recall_train, f1_train, auc_train = train_res
+        acc_test, precision_test, recall_test, f1_test, auc_test = test_res
+        print(f"{model} acc_train: {acc_train}, precision_train: {precision_train}, recall_train: {recall_train}, f1_train: {f1_train}, auc_train: {auc_train}")
+        print(f"{model} acc_test: {acc_test}, precision_test: {precision_test}, recall_test: {recall_test}, f1_test: {f1_test}, auc_test: {auc_test}")
+
+        # free GPU memory
+        del detector
+        torch.cuda.empty_cache()
+
+        return {
+            'name': model,
+            'predictions': predictions,
+            'general': {
+                'acc_train': acc_train,
+                'precision_train': precision_train,
+                'recall_train': recall_train,
+                'f1_train': f1_train,
+                'auc_train': auc_train,
+                'acc_test': acc_test,
+                'precision_test': precision_test,
+                'recall_test': recall_test,
+                'f1_test': f1_test,
+                'auc_test': auc_test,
+            }
+        }
+    else:
+        train_text = data['train']['text']
+        train_label = data['train']['label']
+        test_text = data['test']['text']
+        test_label = data['test']['label']
+
+        # detector.save_pretrained(".cache/lm-d-xxx", from_pt=True)
+
+        if num_labels == 2:
+            train_preds = get_supervised_model_prediction(
+                detector, tokenizer, train_text, batch_size, DEVICE, pos_bit)
+            test_preds = get_supervised_model_prediction(
+                detector, tokenizer, test_text, batch_size, DEVICE, pos_bit)
+        else:
+            train_preds = get_supervised_model_prediction_multi_classes(
+                detector, tokenizer, train_text, batch_size, DEVICE, pos_bit)
+            test_preds = get_supervised_model_prediction_multi_classes(
+                detector, tokenizer, test_text, batch_size, DEVICE, pos_bit)
+
+        predictions = {
+            'train': train_preds,
+            'test': test_preds,
+        }
+        y_train_pred_prob = train_preds
+        y_train_pred = [round(_) for _ in y_train_pred_prob]
+        y_train = train_label
+
+        y_test_pred_prob = test_preds
+        y_test_pred = [round(_) for _ in y_test_pred_prob]
+        y_test = test_label
+
+        train_res = cal_metrics(y_train, y_train_pred, y_train_pred_prob, no_auc)
+        test_res = cal_metrics(y_test, y_test_pred, y_test_pred_prob, no_auc)
+        acc_train, precision_train, recall_train, f1_train, auc_train = train_res
+        acc_test, precision_test, recall_test, f1_test, auc_test = test_res
+        print(f"{model} acc_train: {acc_train}, precision_train: {precision_train}, recall_train: {recall_train}, f1_train: {f1_train}, auc_train: {auc_train}")
+        print(f"{model} acc_test: {acc_test}, precision_test: {precision_test}, recall_test: {recall_test}, f1_test: {f1_test}, auc_test: {auc_test}")
+
+        # free GPU memory
+        del detector
+        torch.cuda.empty_cache()
+
+        return {
+            'name': model,
+            'predictions': predictions,
+            'general': {
+                'acc_train': acc_train,
+                'precision_train': precision_train,
+                'recall_train': recall_train,
+                'f1_train': f1_train,
+                'auc_train': auc_train,
+                'acc_test': acc_test,
+                'precision_test': precision_test,
+                'recall_test': recall_test,
+                'f1_test': f1_test,
+                'auc_test': auc_test,
+            }
+        }
 
 
 def get_supervised_model_prediction(model, tokenizer, data, batch_size, DEVICE, pos_bit=0):
@@ -121,7 +176,7 @@ def get_supervised_model_prediction_multi_classes(model, tokenizer, data, batch_
     return preds
 
 
-def fine_tune_model(model, tokenizer, data, batch_size, DEVICE, pos_bit=1, num_labels=2, epochs=3):
+def fine_tune_model(model, tokenizer, data, batch_size, DEVICE, pos_bit=1, num_labels=2, epochs=3, ckpt_dir='./ckpt/'):
 
     # https://huggingface.co/transformers/v3.2.0/custom_datasets.html
 
@@ -165,3 +220,11 @@ def fine_tune_model(model, tokenizer, data, batch_size, DEVICE, pos_bit=1, num_l
             loss.backward()
             optimizer.step()
     model.eval()
+    if not os.path.exists(ckpt_dir):
+        os.makedirs(ckpt_dir)
+
+    # 保存模型
+    model_path = os.path.join(ckpt_dir, f"{model._get_name()}.pt")
+    torch.save(model.state_dict(), model_path)
+
+    print(f"Model saved to {model_path}")
