@@ -1,6 +1,5 @@
 <div align="center">
 <h1>LLM-as-a-Coauthor: The Challenges of Detecting LLM-Human Mixcase</h1>
-<a href="https://arxiv.org/abs/2401.05952" target='_blank'>[arXiv]</a>
 <img src="figures/outline.jpg">
 <img src="figures/self_bleu.jpg">
 <p align="center">
