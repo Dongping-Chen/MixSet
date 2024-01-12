@@ -1,12 +1,12 @@
 <div align="center">
-<h1>Mixset</h1>
-<a href="https://arxiv.org/pdf/2311.06749" target='_blank'>[arXiv]</a>
+<h1>LLM-as-a-Coauthor: The Challenges of Detecting LLM-Human Mixcase</h1>
+<a href="https://arxiv.org/abs/2401.05952" target='_blank'>[arXiv]</a>
 <img src="figures/outline.jpg">
 <img src="figures/self_bleu.jpg">
 <p align="center">
 
 </p>
-This repository is a official code of the research presented in the paper <a href="https://arxiv.org/pdf/2311.06749" target='_blank'>[arXiv]</a>. The goal is to provide a transparent, open-source implementation for the community to explore and build upon.
+This repository is a official code of the research presented in the paper <a href="https://arxiv.org/abs/2401.05952" target='_blank'>[arXiv]</a>. The goal is to provide a transparent, open-source implementation for the community to explore and build upon.
 </div>
 
 # Dataset: MixSet
@@ -16,9 +16,6 @@ The MixSet dataset is a comprehensive collection designed for advanced machine l
 
 ### Location
 The dataset is located in the `./data/MixSet/` directory relative to the project's root. Ensure that this path exists and contains the necessary data files before running any scripts that depend on the MixSet dataset.
-
-### Structure
-Describe in detailed in [readme](https://github.com/Dongping-Chen/MixSet/tree/main/data/MixSet).
 
 ### Usage
 To use the MixSet dataset in your experiments, refer to the scripts or modules specifically designed to read and process this data. Ensure that any path or configuration settings in your scripts point to the correct `./data/MixSet/` location.
@@ -146,5 +143,12 @@ This project is based on the findings and methodologies presented in the paper [
 ## Citation
 
 ```
-
+@misc{gao2024llmasacoauthor,
+      title={LLM-as-a-Coauthor: The Challenges of Detecting LLM-Human Mixcase}, 
+      author={Chujie Gao and Dongping Chen and Qihui Zhang and Yue Huang and Yao Wan and Lichao Sun},
+      year={2024},
+      eprint={2401.05952},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
 ```
