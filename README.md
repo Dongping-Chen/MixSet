@@ -5,7 +5,7 @@
 <p align="center">
 
 </p>
-This repository is a official code of the research presented in the paper <a href="https://arxiv.org/abs/2401.05952" target='_blank'>[arXiv]</a>. The goal is to provide a transparent, open-source implementation for the community to explore and build upon.
+This repository is an official code of the research presented in the paper <a href="https://arxiv.org/abs/2401.05952" target='_blank'>[arXiv]</a>. The goal is to provide a transparent, open-source implementation for the community to explore and build upon.
 </div>
 
 # Dataset: MixSet
