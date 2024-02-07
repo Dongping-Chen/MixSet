@@ -134,20 +134,20 @@ if __name__ == '__main__':
     outputs = []
     
     if args.three_classes:
-        outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        outputs.append(run_threshold_experiment(
-            data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        outputs.append(run_threshold_experiment(
-            data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        # outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        # outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        # outputs.append(run_threshold_experiment(
+        #     data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        # outputs.append(run_threshold_experiment(
+        #     data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        # outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_supervised_experiment(data, model='distilbert-base-uncased',
                    cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, num_labels=3, finetune=True, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_supervised_experiment(data, model='Hello-SimpleAI/chatgpt-detector-roberta',
                     cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, num_labels=3, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=True))
-        outputs.append(run_detectgpt_experiments(
-            args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        
+        # outputs.append(run_detectgpt_experiments(
+        #     args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        # outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only, three_classes=args.three_classes))
     else:
         if not args.only_supervised:
             outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))

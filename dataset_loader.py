@@ -204,18 +204,20 @@ def process_mixcase_data(filename1, filename2, no_auc, mixcase_threshold, train_
             data_new['test']['label'] += Mixcase_data['label']
         else:
             # Load and process multiple files for Mixcase data
-            load_and_process_multiple_mixcase_files(data_new, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mgt_only_gpt=mgt_only_gpt, mixcase_as_mgt=mixcase_as_mgt)
-            Test_Mixcase_data = load_Mixcase(filename1, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mixcase_as_mgt)
+            # load_and_process_multiple_mixcase_files(data_new, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mgt_only_gpt=mgt_only_gpt, mixcase_as_mgt=mixcase_as_mgt)
+            print(filename1)
+            # exit(0)
+            Test_Mixcase_data = load_Mixcase(filename1, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mixcase_as_mgt=mixcase_as_mgt)
             data_new['test']['text'] += Test_Mixcase_data['test']['text']
             data_new['test']['label'] += Test_Mixcase_data['test']['label']
     else:
         # Ex3, Transfer learning setting, train on operation of filename1 and evaluate on filename2.
-        Train_Mixcase_data = load_Mixcase(filename1, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mixcase_as_mgt)
+        Train_Mixcase_data = load_Mixcase(filename1, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mixcase_as_mgt=mixcase_as_mgt)
         data_new['train']['text'] += Train_Mixcase_data['train']['mixcase']['text']
         data_new['train']['label'] += Train_Mixcase_data['train']['mixcase']['label']
         data_new['train']['text'] += Train_Mixcase_data['train']['other']['text']
         data_new['train']['label'] += Train_Mixcase_data['train']['other']['label']
-        Test_Mixcase_data = load_Mixcase(filename2, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mixcase_as_mgt)
+        Test_Mixcase_data = load_Mixcase(filename2, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mixcase_as_mgt=mixcase_as_mgt)
         data_new['test']['text'] += Test_Mixcase_data['test']['text']
         data_new['test']['label'] += Test_Mixcase_data['test']['label']
 
@@ -337,12 +339,14 @@ def load_Mixcase(filename, no_auc:bool=False, mixcase_threshold: float=0.8, trai
             # if  len(i['HWT_sentence'].split()) > 1 and len(i[real_key].split()) > 1 and len(i[real_key]) < 2000:
             mgt.append(i[real_key])
             hwt.append(i['HWT_sentence'])
+        print(111)
     else:
         if not mixcase_as_mgt:
             test_MGT = False
             for i in f:
                 mgt.append(i['MGT_sentence'])
                 hwt.append(i[real_key])
+            print(222)
         else:
             test_MGT = True
             for i in f:
@@ -351,6 +355,7 @@ def load_Mixcase(filename, no_auc:bool=False, mixcase_threshold: float=0.8, trai
                 f2 = json.load(file)
             for i in f2:
                 hwt.append(i['HWT_sentence'])
+            print(333)
     
     print(f"Test_MGT:{test_MGT}")
     index_list = list(range(len(mgt) + len(hwt)))

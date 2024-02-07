@@ -39,7 +39,7 @@ def run_supervised_experiment(data, model, cache_dir, batch_size, DEVICE, pos_bi
         if not os.path.isfile(model_path):
             raise FileNotFoundError(f"No model found at {model_path}")
 
-        model.load_state_dict(torch.load(model_path))
+        detector.load_state_dict(torch.load(model_path))
     if test_only:
         test_text = data['test']['text']
         test_label = data['test']['label']
