@@ -78,11 +78,10 @@ if __name__ == '__main__':
                                    three_classes = args.three_classes,
                                    mixcase_as_mgt = args.mixcase_as_mgt)
     if not os.path.exists(args.ckpt_dir):
-        # 如果文件夹不存在，则创建它
         os.makedirs(args.ckpt_dir)
-        print(f"文件夹 '{args.ckpt_dir}' 已创建。")
+        print(f"'{args.ckpt_dir}' are created.")
     else:
-        print(f"文件夹 '{args.ckpt_dir}' 已存在。")
+        print(f"'{args.ckpt_dir}' already exist.")
     DEVICE = args.DEVICE
 
     START_DATE = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -134,20 +133,20 @@ if __name__ == '__main__':
     outputs = []
     
     if args.three_classes:
-        # outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_threshold_experiment(
-        #     data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_threshold_experiment(
-        #     data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(data, rank_criterion, "rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(
+            data, logrank_criterion, "log_rank", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_threshold_experiment(
+            data, entropy_criterion, "entropy", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_GLTR_experiment(data, GLTR_criterion, "rank_GLTR", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_supervised_experiment(data, model='distilbert-base-uncased',
                    cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, num_labels=3, finetune=True, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_supervised_experiment(data, model='Hello-SimpleAI/chatgpt-detector-roberta',
                     cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, num_labels=3, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=True))
-        # outputs.append(run_detectgpt_experiments(
-        #     args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
-        # outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only, three_classes=args.three_classes))
+        outputs.append(run_detectgpt_experiments(
+            args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
+        outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only, three_classes=args.three_classes))
     else:
         if not args.only_supervised:
             outputs.append(run_threshold_experiment(data, ll_criterion, "likelihood", test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
@@ -163,7 +162,7 @@ if __name__ == '__main__':
             outputs.append(run_detectgpt_experiments(
                 args, data, base_model, base_tokenizer, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         outputs.append(run_sentinel(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
-        # outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
+        outputs.append(run_radar(data, DEVICE=DEVICE, finetune=args.finetune, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, test_only=args.test_only))
         outputs.append(run_supervised_experiment(data, model='roberta-base-openai-detector',
                     cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir, finetune=args.finetune))
         outputs.append(run_supervised_experiment(data, model='Hello-SimpleAI/chatgpt-detector-roberta',
@@ -172,10 +171,7 @@ if __name__ == '__main__':
                     cache_dir=cache_dir, batch_size=batch_size, DEVICE=DEVICE, pos_bit=1, finetune=True, test_only = args.test_only, no_auc=args.no_auc, ckpt_dir=args.ckpt_dir))
         
 
-    # save results
-    import pickle as pkl
-    with open(os.path.join(SAVE_PATH, f"benchmark_results.pkl"), "wb") as f:
-        pkl.dump(outputs, f)
+    # save results 
     with open(f"logs/{args.log_name}", "a") as wf:
         for row in outputs:
             json.dump(row, wf)

@@ -89,7 +89,6 @@ def fine_tune_model(model, tokenizer, data, batch_size, DEVICE, epochs=3, ckpt_d
     train_encodings = tokenizer(train_text, truncation=True, padding='longest', pad_to_multiple_of=512)
     train_labels = tokenizer(train_label, padding='max_length', max_length=512, truncation=True).input_ids
 
-    # 将除第一个标记以外的所有标记设置为 -100
     train_labels = [[-100] * (512 - 1) + [label[0]] for label in train_labels]
     
     train_dataset = CustomDataset(train_encodings, train_labels)

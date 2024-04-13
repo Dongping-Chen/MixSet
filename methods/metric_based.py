@@ -124,7 +124,7 @@ def run_threshold_experiment(data, criterion_fn, name, test_only: bool=False, no
 
     return {
         'name': f'{name}_threshold',
-        'predictions': {'train': train_criterion, 'test': test_criterion},
+        # 'predictions': {'train': train_criterion, 'test': test_criterion},
         'general': {
             'acc_train': acc_train,
             'precision_train': precision_train,
@@ -169,7 +169,7 @@ def run_GLTR_experiment(data, criterion_fn, name, test_only: bool=False, no_auc:
 
     return {
         'name': f'{name}_threshold',
-        'predictions': {'train': train_criterion, 'test': test_criterion},
+        # 'predictions': {'train': train_criterion, 'test': test_criterion},
         'general': {
             'acc_train': acc_train,
             'precision_train': precision_train,

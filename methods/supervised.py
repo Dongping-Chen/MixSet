@@ -74,7 +74,7 @@ def run_supervised_experiment(data, model, cache_dir, batch_size, DEVICE, pos_bi
 
         return {
             'name': model,
-            'predictions': predictions,
+            # 'predictions': predictions,
             'general': {
                 'acc_train': acc_train,
                 'precision_train': precision_train,
@@ -132,7 +132,7 @@ def run_supervised_experiment(data, model, cache_dir, batch_size, DEVICE, pos_bi
 
         return {
             'name': model,
-            'predictions': predictions,
+            # 'predictions': predictions,
             'general': {
                 'acc_train': acc_train,
                 'precision_train': precision_train,
@@ -223,8 +223,8 @@ def fine_tune_model(model, tokenizer, data, batch_size, DEVICE, pos_bit=1, num_l
     if not os.path.exists(ckpt_dir):
         os.makedirs(ckpt_dir)
 
-    # 保存模型
-    model_path = os.path.join(ckpt_dir, f"{model._get_name()}.pt")
+    # save model
+    model_path = os.path.join(ckpt_dir, f"{model._get_name()}.pth")
     torch.save(model.state_dict(), model_path)
 
     print(f"Model saved to {model_path}")

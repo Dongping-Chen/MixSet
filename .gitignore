@@ -8,3 +8,4 @@ results/
 .cache/
 __pycache__/
 methods/__pycache__/
+test.ipynb

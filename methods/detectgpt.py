@@ -255,7 +255,7 @@ def get_perturbation_results(args, data, mask_model, mask_tokenizer, base_model,
     return results
 
 
-def run_perturbation_experiment(args, results, criterion, span_length=10, n_perturbations=1):
+def run_perturbation_experiment(args, results, criterion, span_length=10, n_perturbations=1, test_only:bool=False, no_auc:bool=False, ckpt_dir:bool=False):
     # Train
     train_predictions = []
     for res in results['train']:
@@ -303,7 +303,7 @@ def run_perturbation_experiment(args, results, criterion, span_length=10, n_pert
         'test': test_predictions
     }
 
-    train_res, test_res = get_clf_results(x_train, y_train, x_test, y_test)
+    train_res, test_res = get_clf_results(x_train, y_train, x_test, y_test, "DetectorGPT", test_only, no_auc, ckpt_dir)
     acc_train, precision_train, recall_train, f1_train, auc_train = train_res
     acc_test, precision_test, recall_test, f1_test, auc_test = test_res
 
@@ -312,13 +312,13 @@ def run_perturbation_experiment(args, results, criterion, span_length=10, n_pert
 
     return {
         'name': name,
-        'predictions': predictions,
+        # 'predictions': predictions,
         'info': {
             'pct_words_masked': args.pct_words_masked,
             'span_length': span_length,
             'n_perturbations': n_perturbations,
         },
-        'raw_results': results,
+        # 'raw_results': results,
         'general': {
             'acc_train': acc_train,
             'precision_train': precision_train,
@@ -334,7 +334,7 @@ def run_perturbation_experiment(args, results, criterion, span_length=10, n_pert
     }
 
 
-def run_detectgpt_experiments(args, data, base_model, base_tokenizer):
+def run_detectgpt_experiments(args, data, base_model, base_tokenizer, test_only:bool=False, no_auc:bool=False, ckpt_dir:bool=False):
     mask_filling_model_name = args.mask_filling_model_name
     cache_dir = args.cache_dir
 
@@ -376,6 +376,6 @@ def run_detectgpt_experiments(args, data, base_model, base_tokenizer):
         args, data, mask_model, mask_tokenizer, base_model, base_tokenizer, args.span_length, n_perturbations)
 
     res = run_perturbation_experiment(args, perturbation_results, perturbation_mode,
-                                      span_length=args.span_length, n_perturbations=n_perturbations)
+                                      span_length=args.span_length, n_perturbations=n_perturbations, test_only=test_only, no_auc=no_auc, ckpt_dir=ckpt_dir)
     print("DetectGPT took %.4f sec" % (time.time() - t1))
     return res

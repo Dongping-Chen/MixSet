@@ -103,7 +103,6 @@ def load_All(filename1, filename2: str = None, MGT_only_GPT: bool = False, train
         hwt_cnt += data_hwt_cnt
         mgt_cnt += data_mgt_cnt
         
-    print(hwt_cnt, mgt_cnt)
     # Process HWT data
     HWT_data = load_HWT(mgt_cnt - hwt_cnt)
     data_new['train']['text'] += HWT_data['text']
@@ -138,8 +137,6 @@ def load_All(filename1, filename2: str = None, MGT_only_GPT: bool = False, train
         random.shuffle(combined)
         data_new['train']['text'], data_new['train']['label'] = zip(*combined)
         
-    print(len(data_new['train']['text']), len(data_new['test']['text']))
-    print(data_new['test']['label'])
     return data_new
 
 def shuffle_and_trim_data(data_new, seed, train_threshold):
@@ -204,9 +201,7 @@ def process_mixcase_data(filename1, filename2, no_auc, mixcase_threshold, train_
             data_new['test']['label'] += Mixcase_data['label']
         else:
             # Load and process multiple files for Mixcase data
-            # load_and_process_multiple_mixcase_files(data_new, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mgt_only_gpt=mgt_only_gpt, mixcase_as_mgt=mixcase_as_mgt)
-            print(filename1)
-            # exit(0)
+            load_and_process_multiple_mixcase_files(data_new, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mgt_only_gpt=mgt_only_gpt, mixcase_as_mgt=mixcase_as_mgt)
             Test_Mixcase_data = load_Mixcase(filename1, no_auc, mixcase_threshold, train_with_mixcase, seed, three_classes, mixcase_as_mgt=mixcase_as_mgt)
             data_new['test']['text'] += Test_Mixcase_data['test']['text']
             data_new['test']['label'] += Test_Mixcase_data['test']['label']
@@ -249,7 +244,6 @@ def load_and_process_multiple_mixcase_files(data_new, no_auc, mixcase_threshold,
     for root, dirs, files in os.walk("/media/ssd/cdp/Mixcase/Mixcase/data/mixcase_data"):
         for file in files:
             if file.endswith('.json'):
-                print(file)
                 if mgt_only_gpt:
                     if "GPT" in file:
                         file_paths.append(os.path.join(root, file))
@@ -266,7 +260,7 @@ def load_and_process_multiple_mixcase_files(data_new, no_auc, mixcase_threshold,
                 data_new['train']['label'] += Mixcase_data['train']['mixcase']['label']
                 data_new['train']['text'] += Mixcase_data['train']['other']['text']
                 data_new['train']['label'] += Mixcase_data['train']['other']['label']
-            print(len(data_new['train']['label']))
+            print(f"The size of MixText in training set: {len(data_new['train']['label'])}")
 
     # Optionally shuffle the data
     new_text, new_label = shuffle_and_trim_data(data_new, seed, len(data_new['train']['label']))
@@ -297,7 +291,6 @@ def load_HWT(HWT_size, seed:int=0):
                 processed_sentence = process_spaces(json_object['sentence'])
                 if len(processed_sentence.split()) > 30 and len(processed_sentence.split()) < 120 and len(processed_sentence) < 2000:
                     data_sum.append(processed_sentence)
-    print(len(data_sum))
     index_list = list(range(len(data_sum)))
     random.seed(seed)
     random.shuffle(index_list)
@@ -307,7 +300,6 @@ def load_HWT(HWT_size, seed:int=0):
     for i in range(min(HWT_size,len(data_sum))):
         index = random.randint(50, 120)
         data_new['text'].append(' '.join(process_spaces(data_sum[index_list[i]]).split()[:min(index,len(data_sum[index_list[i]].split()))]))
-    print(len(data_new['label']),len(data_new['text']))
     return data_new
 
 def load_Mixcase(filename, no_auc:bool=False, mixcase_threshold: float=0.8, train_with_mixcase:bool = False, seed:int=None, three_classes:bool=False, mixcase_as_mgt:bool=False):
@@ -339,14 +331,12 @@ def load_Mixcase(filename, no_auc:bool=False, mixcase_threshold: float=0.8, trai
             # if  len(i['HWT_sentence'].split()) > 1 and len(i[real_key].split()) > 1 and len(i[real_key]) < 2000:
             mgt.append(i[real_key])
             hwt.append(i['HWT_sentence'])
-        print(111)
     else:
         if not mixcase_as_mgt:
             test_MGT = False
             for i in f:
                 mgt.append(i['MGT_sentence'])
                 hwt.append(i[real_key])
-            print(222)
         else:
             test_MGT = True
             for i in f:
@@ -355,7 +345,6 @@ def load_Mixcase(filename, no_auc:bool=False, mixcase_threshold: float=0.8, trai
                 f2 = json.load(file)
             for i in f2:
                 hwt.append(i['HWT_sentence'])
-            print(333)
     
     print(f"Test_MGT:{test_MGT}")
     index_list = list(range(len(mgt) + len(hwt)))
@@ -387,7 +376,6 @@ def load_Mixcase(filename, no_auc:bool=False, mixcase_threshold: float=0.8, trai
                     data_new['text'].append(
                         process_spaces(mgt[index]))
                     data_new['label'].append(1)
-        print(len(data_new['label']),len(data_new['text']))
         return data_new
     else:
         data_new = {

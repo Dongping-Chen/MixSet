@@ -120,11 +120,11 @@ def run_radar(data, DEVICE, finetune: bool=False, no_auc: bool=False, ckpt_dir =
     if not three_classes:
         dict_before = evaluate_model(model, tokenizer, data, DEVICE, no_auc=no_auc)
     
-    # if finetune and not test_only:
-    #     fine_tune_radar(model, tokenizer, data, batch_size=12, DEVICE=DEVICE, epochs=3, ckpt_dir = ckpt_dir, three_classes=three_classes)
-    # elif finetune and test_only:
-    model = AutoModelForSequenceClassification.from_pretrained(os.path.join(ckpt_dir, 'radar-finetuned')).to(DEVICE)
-        
+    if finetune and not test_only:
+        fine_tune_radar(model, tokenizer, data, batch_size=12, DEVICE=DEVICE, epochs=3, ckpt_dir = ckpt_dir, three_classes=three_classes)
+    elif finetune and test_only:
+        model = AutoModelForSequenceClassification.from_pretrained(os.path.join(ckpt_dir, 'radar-finetuned')).to(DEVICE)
+    
     dict_after = evaluate_model(model, tokenizer, data, DEVICE, no_auc=no_auc)
     
     return {"Radar_retrained" if finetune else "Radar": dict_after}

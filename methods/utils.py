@@ -7,6 +7,7 @@ from functools import wraps
 import random
 import pickle
 import os
+from joblib import dump, load 
 
 def timeit(func):
     @wraps(func)
@@ -107,16 +108,14 @@ def cal_metrics(label, pred_label, pred_posteriors, no_auc):
 
 
 def get_clf_results(x_train, y_train, x_test, y_test, name, test_only, no_auc, ckpt_dir):
-    model_path = f"{ckpt_dir}/{name}.pkl"
+    model_path = f"{ckpt_dir}/{name}.joblib"  
     if test_only:
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found at {model_path}")
-        with open(model_path, 'rb') as file:
-            clf = pickle.load(file)
+        clf = load(model_path)  
     else:
         clf = LogisticRegression(random_state=0).fit(x_train, y_train)
-        with open(model_path, 'wb') as file:
-            pickle.dump(clf, file)
+        dump(clf, model_path)  
     if test_only:
         train_res = 0, 0, 0, 0, -1.0
     else:
