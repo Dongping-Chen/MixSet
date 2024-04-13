@@ -23,7 +23,7 @@
 ## Table of content
 - [Dataset: MixSet](#dataset-mixset)
   - [Overview](#overview)
-    - [Dataset Location](#dataset-location)
+  - [Dataset Location](#dataset-location)
 - [Usage](#usage)
   - [Benchmark your MGT/MixText detector](#benchmark-your-mgtmixtext-detector)
   - [Experiment Reproduce](#experiment-reproduce)
@@ -43,7 +43,7 @@
 ## Overview
 The MixSet dataset is a comprehensive collection designed for advanced Machine Learning experiments. It's structured to support a variety of tasks including MGT classification in the era of LLMs, natural language understanding, and more.
 
-### Dataset Location
+## Dataset Location
 The dataset is located in the `./data/MixSet/` directory relative to the project's root. Ensure that this path exists and contains the necessary data files before running any scripts that depend on the MixSet dataset.
 
 # Usage
