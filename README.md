@@ -77,11 +77,10 @@ pip install -r requirements.txt
 ```
 
 3. **Download Datasets**
-To download the pure MGT datasets, please refer to [this link](https://1drv.ms/u/s!AivM2GUMbPYyjkgx6us826N6_j2P?e=yriuqR), then move the dataset folders to `<YOUR PATH>/MixSet/data/MGT_datasets/`.
-To download the pure HWT datasets, please refer to [this link](https://1drv.ms/u/s!AivM2GUMbPYyjkl-aRs1m_l5X9kW?e=xu2QjU), then move the dataset folders to `<YOUR PATH>/MixSet/data/pure_processed_HWT/`.
+To download the pure MGT and HWT datasets, please refer to [this link](https://1drv.ms/f/c/32f66c0c65d8cc2b/EhHB-1xMpdhCsCmab_wbu-4Bz1ykkSRndRsiWzv8c7tLgg?e=2uYUgW), then move the dataset folders to `<YOUR PATH>/MixSet/data/MGT_datasets/` and  `<YOUR PATH>/MixSet/data/pure_processed_HWT/`.
 
 4. **Download Checkpoints of GPT-Sentinel**
-Download the pre-trained [GPT-Sentinel t5-small](https://1drv.ms/u/s!AivM2GUMbPYyjkqfT_3Ri-fpnifX?e=eqG1t7) and put to `<YOUR PATH>/MixSet/`.
+Download the pre-trained `GPT-Sentinel t5-small` follow the instruction [here](https://github.com/haok1402/GPT-Sentinel-public), download the `t5-small.0422.pt` and put to `<YOUR PATH>/MixSet/`.
 
 
 ### Experiment 1
